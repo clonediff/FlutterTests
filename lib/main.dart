@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyFirstApp());
+  runApp(const MyFirstApp());
 }
 
 class MyFirstApp extends StatelessWidget {
@@ -12,30 +12,87 @@ class MyFirstApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: 'IndieFlower'),
       home: Scaffold(
+        backgroundColor: const Color.fromRGBO(120, 137, 207, 1),
         appBar: AppBar(
-          title: const Text('Adding Assets'),
+          title: const Text('Counter'),
+          backgroundColor: const Color.fromRGBO(63, 84, 190, 1),
+          centerTitle: true,
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
-        body: Center(
-          child: Stack(
-            fit: StackFit.expand,
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Image(
-                image: AssetImage('assets/images/bg.jpg'),
+              Text(
+                'Tap "-" to decrement',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
               ),
-              Image.asset('assets/icons/icon.png'),
-              const Positioned(
-                top: 16,
-                left: 100,
-                child: Text(
-                  'My custom font',
-                  style: TextStyle(fontSize: 30),
-                ),
+              CounterWidget(),
+              Text(
+                'Tap "+" to increment',
+                style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CounterWidget extends StatefulWidget {
+  const CounterWidget({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _CounterWidgetState();
+}
+
+class _CounterWidgetState extends State<CounterWidget> {
+  int _counter = 50;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      height: 50,
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(197, 202, 236, 1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          IconButton(
+            onPressed: () => setState(() {
+              _counter--;
+            }),
+            icon: const Icon(Icons.remove),
+          ),
+          Text(
+            "$_counter",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          IconButton(
+            onPressed: () => setState(() {
+              _counter++;
+            }),
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }
