@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -13,25 +15,41 @@ class MyFirstApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: DefaultAppBar(
-            title: const Text('Building layouts'),
-          ),
-          body: Container(
-            decoration: BoxDecoration(
-              color: Colors.indigo.shade100,
+        appBar: DefaultAppBar(
+          title: const Text('Building layouts'),
+        ),
+        body: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 2,
+              child: Image.asset('assets/images/bg.jpg'),
             ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              textBaseline: TextBaseline.alphabetic,
-              children: <Widget>[
-                Icon(Icons.adjust, size: 50, color: Colors.red),
-                Icon(Icons.adjust, size: 200, color: Colors.green),
-                Icon(Icons.adjust, size: 50, color: Colors.blue),
-                Icon(Icons.adjust, size: 50, color: Colors.orange),
-              ],
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: const EdgeInsets.all(30),
+                color: Colors.red,
+                child: const Text('1'),
+              ),
             ),
-          )),
+            Expanded(
+              flex: 2,
+              child: Container(
+                padding: const EdgeInsets.all(30),
+                color: Colors.green,
+                child: const Text('2'),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(30),
+                color: Colors.blue,
+                child: const Text('3'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
