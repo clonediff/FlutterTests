@@ -16,8 +16,8 @@ class MyFirstApp extends StatelessWidget {
         appBar: DefaultAppBar(
           title: const Text('Building layouts'),
         ),
-        body: const Padding(
-          padding: EdgeInsets.all(16),
+        body: const Align(
+          alignment: Alignment(0, 1),
           child: Text(
             'Hello flutter!',
             style: TextStyle(fontSize: 30),
