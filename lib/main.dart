@@ -13,22 +13,25 @@ class MyFirstApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: DefaultAppBar(
-          title: const Text('Building layouts'),
-        ),
-        body: Container(
-          decoration: BoxDecoration(color: Colors.amber,border: Border.all(),),
-          width: 200,
-          height: 100,
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.all(30),
-          alignment: Alignment.center,
-          child: const Text(
-            'Hello flutter!',
-            style: TextStyle(fontSize: 25),
+          appBar: DefaultAppBar(
+            title: const Text('Building layouts'),
           ),
-        ),
-      ),
+          body: Container(
+            decoration: BoxDecoration(
+              color: Colors.indigo.shade100,
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              textBaseline: TextBaseline.alphabetic,
+              children: <Widget>[
+                Icon(Icons.adjust, size: 50, color: Colors.red),
+                Icon(Icons.adjust, size: 200, color: Colors.green),
+                Icon(Icons.adjust, size: 50, color: Colors.blue),
+                Icon(Icons.adjust, size: 50, color: Colors.orange),
+              ],
+            ),
+          )),
     );
   }
 }
