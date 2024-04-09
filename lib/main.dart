@@ -18,35 +18,18 @@ class MyFirstApp extends StatelessWidget {
         appBar: DefaultAppBar(
           title: const Text('Building layouts'),
         ),
-        body: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: Image.asset('assets/images/bg.jpg'),
-            ),
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: const EdgeInsets.all(30),
-                color: Colors.red,
-                child: const Text('1'),
+        body: const Stack(
+          alignment: Alignment(0, 0),
+          children: [
+            Icon(Icons.airplay, color: Colors.red, size: 200),
+            Positioned(
+              top: 60,
+              left: 45,
+              child: Text(
+                'TV',
+                style: TextStyle(fontSize: 30),
               ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: const EdgeInsets.all(30),
-                color: Colors.green,
-                child: const Text('2'),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(30),
-                color: Colors.blue,
-                child: const Text('3'),
-              ),
-            ),
+            )
           ],
         ),
       ),
