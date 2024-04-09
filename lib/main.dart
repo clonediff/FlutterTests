@@ -16,11 +16,16 @@ class MyFirstApp extends StatelessWidget {
         appBar: DefaultAppBar(
           title: const Text('Building layouts'),
         ),
-        body: const Align(
-          alignment: Alignment(0, 1),
-          child: Text(
+        body: Container(
+          decoration: BoxDecoration(color: Colors.amber,border: Border.all(),),
+          width: 200,
+          height: 100,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(30),
+          alignment: Alignment.center,
+          child: const Text(
             'Hello flutter!',
-            style: TextStyle(fontSize: 30),
+            style: TextStyle(fontSize: 25),
           ),
         ),
       ),
