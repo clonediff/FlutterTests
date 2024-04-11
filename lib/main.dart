@@ -10,50 +10,64 @@ class MyFirstApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: DefaultAppBar(title: const Text('Routing and Navigation')),
-        body: const HomePage(),
-      ),
-      initialRoute: '/page2',
-      routes: {
-        '/page2': (context) => const Page2(),
-      },
+      home: FirstPage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/page2');
-        },
-        child: const Text('Move to Page 2'),
-      ),
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  const Page2({super.key});
+class FirstPage extends StatelessWidget {
+  const FirstPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: const Text('Page 2'),
+        title: const Text('First Home'),
       ),
       body: Center(
-        child: ElevatedButton(onPressed: (){
-          Navigator.of(context).pop();
-        }, child: const Text('Go back'),),
+        child: ElevatedButton(
+          onPressed: () {
+            const user = User(name: 'Konstantin', age: 34);
+            Route route = MaterialPageRoute(
+              builder: (context) => const SecondHome(user: user),
+            );
+            Navigator.of(context).push(route);
+          },
+          child: const Text('Second Home'),
+        ),
       ),
     );
   }
+}
+
+class SecondHome extends StatelessWidget {
+  final User user;
+
+  const SecondHome({super.key, required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: DefaultAppBar(
+        title: Text('${user.name} - ${user.age}'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Go back'),
+        ),
+      ),
+    );
+  }
+}
+
+class User {
+  final String name;
+  final int age;
+
+  const User({required this.name, required this.age});
 }
 
 class DefaultAppBar extends AppBar {
