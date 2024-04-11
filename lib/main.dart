@@ -10,13 +10,17 @@ class MyFirstApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: FirstPage(),
+      home: const FirstHome(),
+      routes: {
+        '/first': (context) => const FirstHome(),
+        '/second': (context) => SecondHome()
+      },
     );
   }
 }
 
-class FirstPage extends StatelessWidget {
-  const FirstPage({super.key});
+class FirstHome extends StatelessWidget {
+  const FirstHome({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +31,9 @@ class FirstPage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            const user = User(name: 'Konstantin', age: 34);
-            Route route = MaterialPageRoute(
-              builder: (context) => const SecondHome(user: user),
-            );
-            Navigator.of(context).push(route);
+            // const user = User(name: 'Konstantin', age: 34);
+            const User? user = null;
+            Navigator.of(context).pushNamed('/second', arguments: user);
           },
           child: const Text('Second Home'),
         ),
@@ -40,16 +42,25 @@ class FirstPage extends StatelessWidget {
   }
 }
 
-class SecondHome extends StatelessWidget {
-  final User user;
+class SecondHome extends StatefulWidget {
 
-  const SecondHome({super.key, required this.user});
+  SecondHome({super.key});
+
+  @override
+  State<SecondHome> createState() => _SecondHomeState();
+}
+
+class _SecondHomeState extends State<SecondHome> {
+  User? user;
 
   @override
   Widget build(BuildContext context) {
+    RouteSettings? settings = ModalRoute.of(context)?.settings;
+    user = settings?.arguments as User?;
+
     return Scaffold(
       appBar: DefaultAppBar(
-        title: Text('${user.name} - ${user.age}'),
+        title: Text(user == null ? 'User is unknown' : '${user!.name} - ${user!.age}'),
       ),
       body: Center(
         child: ElevatedButton(
