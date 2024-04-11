@@ -11,9 +11,19 @@ class MyFirstApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: const FirstHome(),
-      routes: {
-        '/first': (context) => const FirstHome(),
-        '/second': (context) => SecondHome()
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(
+              builder: (context) => const FirstHome(),
+            );
+          case '/second':
+            User? user = settings.arguments as User?;
+            return MaterialPageRoute(
+              builder: (context) => SecondHome(user: user),
+            );
+          default:
+        }
       },
     );
   }
@@ -31,8 +41,8 @@ class FirstHome extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // const user = User(name: 'Konstantin', age: 34);
-            const User? user = null;
+            const user = User(name: 'Konstantin', age: 34);
+            // const User? user = null;
             Navigator.of(context).pushNamed('/second', arguments: user);
           },
           child: const Text('Second Home'),
@@ -42,25 +52,16 @@ class FirstHome extends StatelessWidget {
   }
 }
 
-class SecondHome extends StatefulWidget {
+class SecondHome extends StatelessWidget {
+  final User? user;
 
-  SecondHome({super.key});
-
-  @override
-  State<SecondHome> createState() => _SecondHomeState();
-}
-
-class _SecondHomeState extends State<SecondHome> {
-  User? user;
+  const SecondHome({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    RouteSettings? settings = ModalRoute.of(context)?.settings;
-    user = settings?.arguments as User?;
-
     return Scaffold(
       appBar: DefaultAppBar(
-        title: Text(user == null ? 'User is unknown' : '${user!.name} - ${user!.age}'),
+        title: Text(user == null ? 'User is not specified' : '${user!.name} - ${user!.age}'),
       ),
       body: Center(
         child: ElevatedButton(
@@ -70,6 +71,22 @@ class _SecondHomeState extends State<SecondHome> {
           child: const Text('Go back'),
         ),
       ),
+    );
+  }
+}
+
+class UnknownRoute extends StatelessWidget {
+  final String routeMessage;
+
+  const UnknownRoute({super.key, required this.routeMessage});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: DefaultAppBar(
+        title: const Text('Unknown route'),
+      ),
+      body: Text('Unknow route called: \n$routeMessage'),
     );
   }
 }
