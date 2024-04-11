@@ -9,93 +9,104 @@ class MyFirstApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const FirstHome(),
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(
-              builder: (context) => const FirstHome(),
-            );
-          case '/second':
-            User? user = settings.arguments as User?;
-            return MaterialPageRoute(
-              builder: (context) => SecondHome(user: user),
-            );
-          default:
-        }
-      },
+    return const MaterialApp(
+      home: FirstScreen(),
     );
   }
 }
 
-class FirstHome extends StatelessWidget {
-  const FirstHome({super.key});
+class FirstScreen extends StatefulWidget {
+  const FirstScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _FirsScreenState();
+}
+
+class _FirsScreenState extends State<FirstScreen> {
+  String text = 'Some Text';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: const Text('First Home'),
+        title: const Text('First screen'),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            const user = User(name: 'Konstantin', age: 34);
-            // const User? user = null;
-            Navigator.of(context).pushNamed('/second', arguments: user);
-          },
-          child: const Text('Second Home'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Text(
+                text,
+                style: const TextStyle(fontSize: 24),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                var route = MaterialPageRoute(
+                    builder: (context) => const SecondScreen());
+                Navigator.of(context).push(route).then((value) => {
+                      setState(() {
+                        text = value;
+                      })
+                    });
+              },
+              child: const Text(
+                'Go to second screen',
+                style: TextStyle(fontSize: 24),
+              ),
+            )
+          ],
         ),
       ),
     );
   }
 }
 
-class SecondHome extends StatelessWidget {
-  final User? user;
+class SecondScreen extends StatefulWidget {
+  const SecondScreen({super.key});
 
-  const SecondHome({super.key, required this.user});
+  @override
+  State<StatefulWidget> createState() => _SecondScreenState();
+}
+
+class _SecondScreenState extends State<SecondScreen> {
+  TextEditingController textFieldController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: Text(user == null ? 'User is not specified' : '${user!.name} - ${user!.age}'),
+        title: const Text('Second screen'),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Go back'),
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: TextField(
+              controller: textFieldController,
+              style: const TextStyle(
+                fontSize: 24,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              String textToSendBack = textFieldController.text;
+              Navigator.of(context).pop(textToSendBack);
+            },
+            child: const Text(
+              'Send text back',
+              style: TextStyle(fontSize: 24),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-class UnknownRoute extends StatelessWidget {
-  final String routeMessage;
-
-  const UnknownRoute({super.key, required this.routeMessage});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: DefaultAppBar(
-        title: const Text('Unknown route'),
-      ),
-      body: Text('Unknow route called: \n$routeMessage'),
-    );
-  }
-}
-
-class User {
-  final String name;
-  final int age;
-
-  const User({required this.name, required this.age});
 }
 
 class DefaultAppBar extends AppBar {
