@@ -14,6 +14,10 @@ class MyFirstApp extends StatelessWidget {
         appBar: DefaultAppBar(title: const Text('Routing and Navigation')),
         body: const HomePage(),
       ),
+      initialRoute: '/page2',
+      routes: {
+        '/page2': (context) => const Page2(),
+      },
     );
   }
 }
@@ -26,8 +30,7 @@ class HomePage extends StatelessWidget {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          Route route = MaterialPageRoute(builder: (context) => const Page2());
-          Navigator.of(context).push(route);
+          Navigator.of(context).pushNamed('/page2');
         },
         child: const Text('Move to Page 2'),
       ),
