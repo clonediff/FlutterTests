@@ -9,40 +9,22 @@ class MyFirstApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> items = List<String>.generate(10000, (i) => 'Item #$i');
+
     return MaterialApp(
       home: Scaffold(
-        appBar: DefaultAppBar(
-          title: const Text('Building List View'),
-        ),
-        body: ListView(
-          padding: const EdgeInsets.all(8),
-          // Позволяет изменить размер ListView по размеру содержимого
-          // shrinkWrap: true,
-          // scrollDirection: Axis.horizontal,
-          // itemExtent: 300,
-          // reverse: true,
-          children: const [
-            ListTile(
-              title: Text('Sunny'),
-              subtitle: Text('Today Clear'),
-              leading: Icon(Icons.wb_sunny),
-              trailing: Icon(Icons.keyboard_arrow_right),
+          appBar: DefaultAppBar(
+            title: const Text('Building List View'),
+          ),
+          body: ListView.builder(
+            itemBuilder: (context, index) => Card(
+              child: ListTile(
+                title: Text(items[index]),
+                leading: const Icon(Icons.insert_photo, color: Colors.red),
+                trailing: const Icon(Icons.keyboard_arrow_right),
+              ),
             ),
-            ListTile(
-              title: Text('Cloudy'),
-              subtitle: Text('Today Cloudy'),
-              leading: Icon(Icons.wb_cloudy),
-              trailing: Icon(Icons.keyboard_arrow_right),
-            ),
-            ListTile(
-              title: Text('Snow'),
-              subtitle: Text('Today Snow'),
-              leading: Icon(Icons.ac_unit),
-              trailing: Icon(Icons.keyboard_arrow_right),
-            )
-          ],
-        ),
-      ),
+          )),
     );
   }
 }
