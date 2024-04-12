@@ -66,3 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+// gen auto json serializer
+// flutter packages pub run build_runner build
+
+// or use online tool
+// https://javiercbk.github.io/json_to_dart/
