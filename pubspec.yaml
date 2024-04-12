@@ -39,6 +39,7 @@ dependencies:
   json_serializable: ^6.7.1
   build_runner: ^2.4.9
   flutter_bloc: ^8.1.5
+  connectivity_plus: ^6.0.2
 
 dev_dependencies:
   flutter_test:
