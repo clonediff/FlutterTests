@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_project/color_bloc.dart';
 import 'package:test_project/default_appbar.dart';
 
@@ -11,8 +12,11 @@ class MyFirstApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: MyHomePage(),
+    return MaterialApp(
+      home: BlocProvider(
+        create: (context) => ColorBloc(),
+        child: const MyHomePage(),
+      ),
     );
   }
 }
@@ -25,28 +29,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final ColorBloc _bloc = ColorBloc();
-
-  @override
-  void dispose() {
-    _bloc.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ColorBloc bloc = BlocProvider.of<ColorBloc>(context);
+
     return Scaffold(
       appBar: DefaultAppBar(
-        title: const Text('BLoC with Stream'),
+        title: const Text('BLoC with flutter_bloc'),
       ),
       body: Center(
-        child: StreamBuilder(
-          stream: _bloc.outputStateStream,
-          initialData: Colors.red,
-          builder: (context, snapshot) => AnimatedContainer(
+        child: BlocBuilder<ColorBloc, Color>(
+          builder: (context, currentColor) => AnimatedContainer(
             height: 100,
             width: 100,
-            color: snapshot.data,
+            color: currentColor,
             duration: const Duration(milliseconds: 500),
           ),
         ),
@@ -56,14 +52,14 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           FloatingActionButton(
             onPressed: () {
-              _bloc.inputEventSink.add(ColorEvent.event_red);
+              bloc.add(RedColorEvent());
             },
             backgroundColor: Colors.red,
           ),
           const SizedBox(width: 10),
           FloatingActionButton(
             onPressed: () {
-              _bloc.inputEventSink.add(ColorEvent.event_green);
+              bloc.add(GreenColorEvent());
             },
             backgroundColor: Colors.green,
           ),
