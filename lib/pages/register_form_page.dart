@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:test_project/default_appbar.dart';
-import 'package:test_project/model/User.dart';
+import 'package:test_project/model/user.dart';
 import 'package:test_project/pages/user_info_page.dart';
 
 class RegisterFormPage extends StatefulWidget {
@@ -154,7 +154,9 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
               ),
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
-              onSaved: (value) => user.email = value,
+              onSaved: (value) {
+                user.email = value!.isEmpty ? null : value;
+              },
             ),
             const SizedBox(
               height: 20,
@@ -194,7 +196,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
               inputFormatters: [
                 LengthLimitingTextInputFormatter(100),
               ],
-              onSaved: (value) => user.story = value,
+              onSaved: (value) => user.story = value!.isEmpty ? null : value,
             ),
             const SizedBox(
               height: 10,
@@ -323,18 +325,19 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
 
   String? _validateName(String? value) {
     final nameExp = RegExp(r'^[A-Za-z ]+$');
-    if (value == null || value.isEmpty) return 'Name is required';
+    if (value!.isEmpty) return 'Name is required';
     if (!nameExp.hasMatch(value)) return 'Please enter alphabetical characters';
     return null;
   }
 
   bool _validatePhoneNumber(String? value) {
     final phoneExp = RegExp(r'^\(\d{3}\)\d{3}-\d{4}$');
-    return phoneExp.hasMatch(value ?? "");
+    return phoneExp.hasMatch(value!);
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Email cannot be empty';
+    // if (value!.isEmpty) return 'Email cannot be empty';
+    if (value!.isEmpty) return null;
     if (!value.contains('@')) return 'Invalid email address';
     return null;
   }

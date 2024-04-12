@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/default_appbar.dart';
-import 'package:test_project/model/User.dart';
+import 'package:test_project/model/user.dart';
 
 class UserInfoPage extends StatelessWidget {
   const UserInfoPage({super.key, required this.userInfo});
@@ -22,12 +22,13 @@ class UserInfoPage extends StatelessWidget {
                 userInfo.name,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
-              subtitle: Text(userInfo.story ?? ""),
+              subtitle: userInfo.story == null ? null : Text(userInfo.story!),
               leading: const Icon(
                 Icons.person,
                 color: Colors.black,
               ),
-              trailing: Text(userInfo.country ?? "Not selected"),
+              trailing:
+                  userInfo.country == null ? null : Text(userInfo.country!),
             ),
             ListTile(
               title: Text(
@@ -39,16 +40,17 @@ class UserInfoPage extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
-            ListTile(
-              title: Text(
-                userInfo.email ?? "",
-                style: const TextStyle(fontWeight: FontWeight.w500),
+            if (userInfo.email != null)
+              ListTile(
+                title: Text(
+                  userInfo.email!,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                leading: const Icon(
+                  Icons.mail,
+                  color: Colors.black,
+                ),
               ),
-              leading: const Icon(
-                Icons.mail,
-                color: Colors.black,
-              ),
-            ),
           ],
         ),
       ),
