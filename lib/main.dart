@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:test_project/color_bloc.dart';
 import 'package:test_project/default_appbar.dart';
-import 'package:test_project/offices.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -25,49 +25,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<OfficesList> officesList;
+  final ColorBloc _bloc = ColorBloc();
 
   @override
-  void initState() {
-    super.initState();
-    officesList = getOfficesList();
+  void dispose() {
+    _bloc.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: const Text('Manual JSON Serialization'),
+        title: const Text('BLoC with Stream'),
       ),
-      body: FutureBuilder<OfficesList>(
-        future: officesList,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-                itemCount: snapshot.data?.offices.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text('${snapshot.data?.offices[index].name}'),
-                      subtitle:
-                      Text('${snapshot.data?.offices[index].address}'),
-                      leading: Image.network(
-                          '${snapshot.data?.offices[index].image}'),
-                      isThreeLine: true,
-                    ),
-                  );
-                });
-          } else if (snapshot.hasError) {
-            return const Text('Error');
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
+      body: Center(
+        child: StreamBuilder(
+          stream: _bloc.outputStateStream,
+          initialData: Colors.red,
+          builder: (context, snapshot) => AnimatedContainer(
+            height: 100,
+            width: 100,
+            color: snapshot.data,
+            duration: const Duration(milliseconds: 500),
+          ),
+        ),
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              _bloc.inputEventSink.add(ColorEvent.event_red);
+            },
+            backgroundColor: Colors.red,
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            onPressed: () {
+              _bloc.inputEventSink.add(ColorEvent.event_green);
+            },
+            backgroundColor: Colors.green,
+          ),
+        ],
       ),
     );
   }
 }
-// gen auto json serializer
-// flutter packages pub run build_runner build
-
-// or use online tool
-// https://javiercbk.github.io/json_to_dart/
