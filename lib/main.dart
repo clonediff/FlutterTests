@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:test_project/default_appbar.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -11,52 +13,83 @@ class MyFirstApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: HomePage());
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: DefaultAppBar(
-        title: const Text('Inherited Widget'),
-      ),
-      body: ScopedModel<MyModelState>(
-        model: MyModelState(),
-        child: const AppRootWidget(),
+    return MaterialApp(
+      title: 'Inherited demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<CountProvider>.value(value: CountProvider()),
+          FutureProvider(
+            create: (context) => UserProvider().loadUserData(),
+            initialData: null,
+          ),
+          StreamProvider(
+            create: (context) => EventProvider().intStream(),
+            initialData: 0,
+          ),
+        ],
+        child: DefaultTabController(
+          length: 3,
+          child: DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text('Provider Demo'),
+                centerTitle: true,
+                bottom: const TabBar(
+                  tabs: [
+                    Tab(icon: Icon(Icons.add)),
+                    Tab(icon: Icon(Icons.person)),
+                    Tab(icon: Icon(Icons.message))
+                  ],
+                ),
+              ),
+              body: const TabBarView(
+                children: [
+                  MyCountPage(),
+                  MyUserPage(),
+                  MyEventPage(),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
-class AppRootWidget extends StatelessWidget {
-  const AppRootWidget({super.key});
+class MyCountPage extends StatelessWidget {
+  const MyCountPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MyModelState>(
-      builder: (context, child, model) => Card(
-        elevation: 4,
+    CountProvider state = Provider.of<CountProvider>(context);
+    return Scaffold(
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('(Root widget)',
-                style: Theme.of(context).textTheme.displayLarge),
-            Text('${model.counterValue}',
-                style: Theme.of(context).textTheme.displayLarge),
+            const Text('ChangeNotifierProvider Example',
+                style: TextStyle(fontSize: 20)),
             const SizedBox(height: 50),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Text('${state.counterValue}',
+                style: Theme.of(context).textTheme.displayLarge),
+            ButtonBar(
+              alignment: MainAxisAlignment.center,
               children: [
-                Counter(),
-                Counter(),
+                IconButton(
+                  onPressed: () => state._decrementCount(),
+                  color: Colors.red,
+                  icon: const Icon(Icons.remove),
+                ),
+                Consumer<CountProvider>(
+                  builder: (context, value, child) => IconButton(
+                    onPressed: () => value._incrementCount(),
+                    color: Colors.green,
+                    icon: const Icon(Icons.add),
+                  ),
+                ),
               ],
             ),
           ],
@@ -66,54 +99,126 @@ class AppRootWidget extends StatelessWidget {
   }
 }
 
-class Counter extends StatelessWidget {
-  const Counter({super.key});
+class MyUserPage extends StatelessWidget {
+  const MyUserPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MyModelState>(
-      rebuildOnChange: true,
-      builder: (context, child, model) => Card(
-        margin: const EdgeInsets.all(4).copyWith(bottom: 32),
-        color: Colors.yellowAccent,
-        child: Column(
-          children: [
-            const Text('(Child Widget)'),
-            Text('${model.counterValue}',
-                style: Theme.of(context).textTheme.displayLarge),
-            ButtonBar(
-              children: [
-                IconButton(
-                  onPressed: () => model._decrementCounter(),
-                  icon: const Icon(Icons.remove),
-                  color: Colors.red,
-                ),
-                IconButton(
-                  onPressed: () => model._incrementCounter(),
-                  icon: const Icon(Icons.add),
-                  color: Colors.green,
-                ),
-              ],
-            )
-          ],
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.all(10),
+          child: Text('FutureProvider Example, users loaded from a File'),
         ),
+        Consumer<List<User>?>(
+          builder: (context, users, child) => Expanded(
+            child: users == null
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ListView.builder(
+                    itemCount: users.length,
+                    itemBuilder: (context, index) => Container(
+                      height: 50,
+                      color: Colors.grey[(index * 200) % 400],
+                      child: Center(
+                        child: Text(
+                            '${users[index].firstName} ${users[index].lastName} | ${users[index].website}'),
+                      ),
+                    ),
+                  ),
+          ),
+          child: null,
+        ),
+      ],
+    );
+  }
+}
+
+class MyEventPage extends StatelessWidget {
+  const MyEventPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var value = Provider.of<int>(context);
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('StreamProvider Example',
+              style: TextStyle(fontSize: 20)),
+          const SizedBox(height: 50),
+          Text('$value', style: Theme.of(context).textTheme.displayLarge),
+        ],
       ),
     );
   }
 }
 
-class MyModelState extends Model {
-  int _counter = 0;
+class CountProvider extends ChangeNotifier {
+  int _count = 0;
 
-  int get counterValue => _counter;
+  int get counterValue => _count;
 
-  void _incrementCounter() {
-    _counter++;
+  void _incrementCount() {
+    _count++;
     notifyListeners();
   }
 
-  void _decrementCounter() {
-    _counter--;
+  void _decrementCount() {
+    _count--;
     notifyListeners();
   }
+}
+
+class UserProvider {
+  final String _dataPath = 'assets/users.json';
+  late List<User> users;
+
+  Future<String> loadAsset() async {
+    return await Future.delayed(const Duration(seconds: 10), () async {
+      return await rootBundle.loadString(_dataPath);
+    });
+  }
+
+  Future<List<User>?> loadUserData() async {
+    var dataString = await loadAsset();
+    Map<String, dynamic> jsonUserData = jsonDecode(dataString);
+    users = UserList.fromJson(jsonUserData['users']).users;
+    print('done loading users! ${jsonUserData['users']}');
+    return users;
+  }
+}
+
+class EventProvider {
+  Stream<int> intStream() {
+    Duration interval = const Duration(seconds: 2);
+    return Stream.periodic(interval, (int count) => count);
+  }
+}
+
+class User {
+  final String firstName, lastName, website;
+
+  const User({
+    required this.firstName,
+    required this.lastName,
+    required this.website,
+  });
+
+  User.fromJson(Map<String, dynamic> json)
+      : this(
+          firstName: json['first_name'],
+          lastName: json['last_name'],
+          website: json['website'],
+        );
+}
+
+class UserList {
+  final List<User> users;
+
+  UserList({required this.users});
+
+  UserList.fromJson(List<dynamic> usersJson)
+      : this(users: usersJson.map((user) => User.fromJson(user)).toList());
 }
