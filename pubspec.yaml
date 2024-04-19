@@ -40,6 +40,7 @@ dependencies:
   build_runner: ^2.4.9
   flutter_bloc: ^8.1.5
   connectivity_plus: ^6.0.2
+  scoped_model: ^2.0.0
 
 dev_dependencies:
   flutter_test:
