@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_project/default_appbar.dart';
+import 'package:test_project/db/database.dart';
+import 'package:test_project/model/student.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -12,110 +12,211 @@ class MyFirstApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shared Preference Demo',
+      title: 'SQLite CRUD Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const SharedPreferenceExample(),
+      home: const StudentPage(),
     );
   }
 }
 
-class SharedPreferenceExample extends StatefulWidget {
-  const SharedPreferenceExample({super.key});
+class StudentPage extends StatefulWidget {
+  const StudentPage({super.key});
 
   @override
-  State<SharedPreferenceExample> createState() =>
-      _SharedPreferenceExampleState();
+  State<StudentPage> createState() => _StudentPageState();
 }
 
-class _SharedPreferenceExampleState extends State<SharedPreferenceExample> {
-  late SharedPreferences _prefs;
+class _StudentPageState extends State<StudentPage> {
+  final GlobalKey<FormState> _formStateKey = GlobalKey();
+  final _studentNameController = TextEditingController();
 
-  static const String kNumberPrefKey = 'number_pref';
-  static const String kBoolPrefKey = 'bool_pref';
-
-  int _numberPref = 0;
-  bool _boolPref = false;
+  late Future<List<Student>> _studentsList;
+  String _studentName = '';
+  bool isUpdate = false;
+  int? studentIdForUpdate;
 
   @override
   void initState() {
     super.initState();
-    SharedPreferences.getInstance().then(
-      (value) {
-        setState(() => _prefs = value);
-        _loadNumberPref();
-        _loadBoolPref();
-      },
-    );
+    updateStudentList();
+  }
+
+  updateStudentList() {
+    setState(() {
+      _studentsList = DBProvider.db.getStudents();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DefaultAppBar(
-        title: const Text('Shared Preference Demo'),
+      appBar: AppBar(
+        title: const Text('SQLite CRUD Demo'),
+        centerTitle: true,
+        backgroundColor: Colors.black,
       ),
       body: Column(
         children: [
-          Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          Form(
+            key: _formStateKey,
+            autovalidateMode: AutovalidateMode.always,
+            child: Column(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                  child: TextFormField(
+                    controller: _studentNameController,
+                    validator: (value) {
+                      if (value!.isEmpty) return 'Please enter Student Name';
+                      if (value.trim() == '') return 'Only Space is not valid!!!';
+                      return null;
+                    },
+                    onSaved: (newValue) {
+                      _studentName = newValue!;
+                    },
+                    decoration: const InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.greenAccent,
+                          width: 2,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
+                      labelText: 'Student Name',
+                      icon: Icon(
+                        Icons.people,
+                        color: Colors.black,
+                      ),
+                      fillColor: Colors.white,
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TableRow(
-                children: [
-                  const Text('Number Preference'),
-                  Text('$_numberPref'),
-                  ElevatedButton(
-                    onPressed: () => _setNumberPref(_numberPref + 1),
-                    child: const Text('Increment'),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formStateKey.currentState!.validate()) {
+                    _formStateKey.currentState!.save();
+                    if (isUpdate) {
+                      DBProvider.db
+                          .updateStudent(
+                              Student(studentIdForUpdate, _studentName))
+                          .then((data) {
+                        setState(() {
+                          isUpdate = false;
+                        });
+                      });
+                    } else {
+                      DBProvider.db.insertStudent(Student(null, _studentName));
+                    }
+                    _studentNameController.text = '';
+                    updateStudentList();
+                  }
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.green,
                   ),
-                ],
+                ),
+                child: Text(
+                  (isUpdate ? 'UPDATE' : 'ADD'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
-              TableRow(
-                children: [
-                  const Text('Boolean Preference'),
-                  Text('$_boolPref'),
-                  ElevatedButton(
-                    onPressed: () => _setBoolPref(!_boolPref),
-                    child: const Text('Toogle'),
+              const Padding(
+                padding: EdgeInsets.all(10),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _studentNameController.text = '';
+                  setState(() {
+                    isUpdate = false;
+                    studentIdForUpdate = null;
+                  });
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.red,
                   ),
-                ],
+                ),
+                child: Text(
+                  (isUpdate ? 'CANCEL UPDATE' : 'CLEAR'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
-          ElevatedButton(
-            onPressed: () => _resetDataPref(),
-            child: const Text('Reset Data'),
+          const Divider(
+            height: 5,
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _studentsList,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) return generateList(snapshot.data!);
+                if (snapshot.data?.isEmpty ?? true) return const Text('No Data found');
+                return const CircularProgressIndicator();
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _setNumberPref(int value) async {
-    await _prefs.setInt(kNumberPrefKey, value);
-    _loadNumberPref();
-  }
-
-  Future<void> _setBoolPref(bool value) async {
-    await _prefs.setBool(kBoolPrefKey, value);
-    _loadBoolPref();
-  }
-
-  void _loadNumberPref() {
-    setState(() {
-      _numberPref = _prefs.getInt(kNumberPrefKey) ?? 0;
-    });
-  }
-
-  void _loadBoolPref() {
-    setState(() {
-      _boolPref = _prefs.getBool(kBoolPrefKey) ?? false;
-    });
-  }
-
-  Future<void> _resetDataPref() async {
-    await _prefs.remove(kNumberPrefKey);
-    await _prefs.remove(kBoolPrefKey);
-    _loadBoolPref();
-    _loadNumberPref();
+  SingleChildScrollView generateList(List<Student> students) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: DataTable(
+          columns: const [
+            DataColumn(
+              label: Text('NAME'),
+            ),
+            DataColumn(
+              label: Text('DELETE'),
+            ),
+          ],
+          rows: students
+              .map(
+                (student) => DataRow(
+                  cells: [
+                    DataCell(
+                      Text(student.name),
+                      onTap: () {
+                        setState(() {
+                          isUpdate = true;
+                          studentIdForUpdate = student.id;
+                        });
+                        _studentNameController.text = student.name;
+                      },
+                    ),
+                    DataCell(IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        DBProvider.db.deleteStudent(student.id!);
+                        updateStudentList();
+                      },
+                    )),
+                  ],
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
   }
 }
