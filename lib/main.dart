@@ -1,8 +1,6 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_project/default_appbar.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -14,126 +12,110 @@ class MyFirstApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Local file read/write Demo',
+      title: 'Shared Preference Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const ReadWriteFileExample(),
+      home: const SharedPreferenceExample(),
     );
   }
 }
 
-class ReadWriteFileExample extends StatefulWidget {
-  const ReadWriteFileExample({super.key});
+class SharedPreferenceExample extends StatefulWidget {
+  const SharedPreferenceExample({super.key});
 
   @override
-  State<ReadWriteFileExample> createState() => _ReadWriteFileExampleState();
+  State<SharedPreferenceExample> createState() =>
+      _SharedPreferenceExampleState();
 }
 
-class _ReadWriteFileExampleState extends State<ReadWriteFileExample> {
-  final TextEditingController _textController = TextEditingController();
+class _SharedPreferenceExampleState extends State<SharedPreferenceExample> {
+  late SharedPreferences _prefs;
 
-  static const String kLocalFileName = 'demo_localfile.txt';
+  static const String kNumberPrefKey = 'number_pref';
+  static const String kBoolPrefKey = 'bool_pref';
 
-  String _localFileContent = '';
-  String _localFilePath = '';
+  int _numberPref = 0;
+  bool _boolPref = false;
 
   @override
   void initState() {
     super.initState();
-    _readFromLocalFile();
-    _getLocalFile.then((file) => setState(() => _localFilePath = file.path));
+    SharedPreferences.getInstance().then(
+      (value) {
+        setState(() => _prefs = value);
+        _loadNumberPref();
+        _loadBoolPref();
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    FocusNode textFieldFocusNode = FocusNode();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Write to local file:',
-          style: TextStyle(fontSize: 20),
-        ),
-        centerTitle: true,
+      appBar: DefaultAppBar(
+        title: const Text('Shared Preference Demo'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: Column(
         children: [
-          const Text(
-            'Write to local file:',
-            style: TextStyle(fontSize: 20),
-          ),
-          TextField(
-            focusNode: textFieldFocusNode,
-            controller: _textController,
-            maxLines: null,
-            style: const TextStyle(fontSize: 20),
-          ),
-          ButtonBar(
+          Table(
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
-              MaterialButton(
-                onPressed: () async {
-                  _readFromLocalFile();
-                  _textController.text = _localFileContent;
-                  FocusScope.of(context).requestFocus(textFieldFocusNode);
-                  log('String successfully loaded from local file');
-                },
-                child: const Text(
-                  'Load',
-                  style: TextStyle(fontSize: 20),
-                ),
+              TableRow(
+                children: [
+                  const Text('Number Preference'),
+                  Text('$_numberPref'),
+                  ElevatedButton(
+                    onPressed: () => _setNumberPref(_numberPref + 1),
+                    child: const Text('Increment'),
+                  ),
+                ],
               ),
-              MaterialButton(
-                onPressed: () async {
-                  await _writeLocalFile(_textController.text);
-                  _textController.clear();
-                  await _readFromLocalFile();
-                  log('String successfully written to local file');
-                },
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 20),
-                ),
+              TableRow(
+                children: [
+                  const Text('Boolean Preference'),
+                  Text('$_boolPref'),
+                  ElevatedButton(
+                    onPressed: () => _setBoolPref(!_boolPref),
+                    child: const Text('Toogle'),
+                  ),
+                ],
               ),
             ],
           ),
-          const Divider(height: 20),
-          Text('Local file path:',
-              style: Theme.of(context).textTheme.titleMedium),
-          Text(_localFilePath, style: Theme.of(context).textTheme.titleSmall),
-          const Divider(height: 20),
-          Text('Local file content:',
-              style: Theme.of(context).textTheme.titleMedium),
-          Text(_localFileContent,
-              style: Theme.of(context).textTheme.titleSmall),
+          ElevatedButton(
+            onPressed: () => _resetDataPref(),
+            child: const Text('Reset Data'),
+          ),
         ],
       ),
     );
   }
 
-  Future<String> get _getLocalPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+  Future<void> _setNumberPref(int value) async {
+    await _prefs.setInt(kNumberPrefKey, value);
+    _loadNumberPref();
   }
 
-  Future<File> get _getLocalFile async {
-    final path = await _getLocalPath;
-    return File('$path/$kLocalFileName');
+  Future<void> _setBoolPref(bool value) async {
+    await _prefs.setBool(kBoolPrefKey, value);
+    _loadBoolPref();
   }
 
-  Future<File> _writeLocalFile(String text) async {
-    final file = await _getLocalFile;
-    return file.writeAsString(text);
-  }
-
-  Future _readFromLocalFile() async {
-    String content;
-    try {
-      final file = await _getLocalFile;
-      content = await file.readAsString();
-    } catch (e) {
-      content = 'Error loading local file: $e';
-    }
+  void _loadNumberPref() {
     setState(() {
-      _localFileContent = content;
+      _numberPref = _prefs.getInt(kNumberPrefKey) ?? 0;
     });
+  }
+
+  void _loadBoolPref() {
+    setState(() {
+      _boolPref = _prefs.getBool(kBoolPrefKey) ?? false;
+    });
+  }
+
+  Future<void> _resetDataPref() async {
+    await _prefs.remove(kNumberPrefKey);
+    await _prefs.remove(kBoolPrefKey);
+    _loadBoolPref();
+    _loadNumberPref();
   }
 }
