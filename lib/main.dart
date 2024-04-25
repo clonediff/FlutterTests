@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_project/page/webview_page.dart';
+import 'package:test_project/page/webview_local_page.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -15,7 +15,7 @@ class MyFirstApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData.dark(),
-      home: const WebViewPage(),
+      home: const WebViewLocalPage(),
     );
   }
 }
