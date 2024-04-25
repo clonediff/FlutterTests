@@ -31,6 +31,21 @@ class _WebViewPageState extends State<WebViewPage> {
             this.progress = progress / 100;
             setState(() {});
           },
+          onPageStarted: (url) {
+            log('Новый сайт: $url');
+          },
+          onPageFinished: (url) {
+            log('Страница полностью загружена');
+          },
+          onNavigationRequest: (request) {
+            if (request.url.startsWith('https://m.youtube.com')) {
+              log('Навигация заблокирована к ${request.url}');
+              return NavigationDecision.prevent;
+            }
+            log('Навигация разрешена к $request');
+
+            return NavigationDecision.navigate;
+          },
         ),
       );
   }
@@ -114,8 +129,11 @@ class _WebViewPageState extends State<WebViewPage> {
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.next_plan, size: 32),
-          onPressed: () =>
-              _webController.loadRequest(Uri.parse('https://www.youtube.com')),
+          onPressed: () async {
+            final currentUrl = await _webController.currentUrl();
+            log('Предыдущий сайт: $currentUrl');
+            _webController.loadRequest(Uri.parse('https://www.youtube.com'));
+          },
         ),
       ),
     );
