@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:test_project/bloc/counter_bloc.dart';
-import 'package:test_project/pages/counter_page.dart';
+import 'package:test_project/page/webview_page.dart';
 
 void main() {
   runApp(const MyFirstApp());
@@ -14,13 +12,10 @@ class MyFirstApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CounterBloc()..add(const CounterEvent.start()),
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData.dark(),
-        home: const CounterPage(),
-      ),
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData.dark(),
+      home: const WebViewPage(),
     );
   }
 }
