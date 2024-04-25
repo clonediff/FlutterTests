@@ -23,7 +23,7 @@ class _WebViewPageState extends State<WebViewPage> {
   void initState() {
     super.initState();
     _webController
-      ..loadRequest(Uri.parse('https://flutter.dev'))
+      ..loadRequest(Uri.parse('https://ulearn.me/login'))
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -36,6 +36,14 @@ class _WebViewPageState extends State<WebViewPage> {
           },
           onPageFinished: (url) {
             log('Страница полностью загружена');
+            // if (url.contains('https://flutter.dev')) {
+            //   log('Удаление footer');
+            //   await Future.delayed(
+            //     const Duration(microseconds: 300),
+            //     () => _webController.runJavaScript(
+            //         "document.getElementsByTagName('footer')[0].style.display='none';"),
+            //   );
+            // }
           },
           onNavigationRequest: (request) {
             if (request.url.startsWith('https://m.youtube.com')) {
@@ -130,9 +138,23 @@ class _WebViewPageState extends State<WebViewPage> {
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.next_plan, size: 32),
           onPressed: () async {
-            final currentUrl = await _webController.currentUrl();
-            log('Предыдущий сайт: $currentUrl');
-            _webController.loadRequest(Uri.parse('https://www.youtube.com'));
+            const email = 'someemail@example.com';
+            const pass = 'somepass';
+            _webController.runJavaScript(
+              "document.getElementById('UserName').value='$email';",
+            );
+            _webController.runJavaScript(
+              "document.getElementById('Password').value='$pass';",
+            );
+            await Future.delayed(const Duration(seconds: 1));
+            await _webController.runJavaScript(
+              "document.forms[1].submit()",
+            );
+
+            // final currentUrl = await _webController.currentUrl();
+            // log('Предыдущий сайт: $currentUrl');
+            // _webController.loadRequest(Uri.parse('https://www.youtube.com'));
+            // await _webController.runJavaScript("document.getElementsByTagName('footer')[0].style.display='none';");
           },
         ),
       ),
