@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,8 +21,33 @@ class _WebViewLocalPageState extends State<WebViewLocalPage> {
     _webController
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadFlutterAssetServer('assets/index.html')
-    ;
-      // ..loadRequest(Uri.parse('https://flutter.dev'))
+      ..addJavaScriptChannel(
+        'MyJSChannel',
+        onMessageReceived: (p0) {
+          log('Javascript: ${p0.message}');
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              content: Text(
+                p0.message,
+                style: const TextStyle(fontSize: 35),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _webController.runJavaScript(
+                      'sendOk()',
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Хорошо'),
+                )
+              ],
+            ),
+          );
+        },
+      );
+    // ..loadRequest(Uri.parse('https://flutter.dev'))
     // loadLocalHTML();
     // loadHTMLFromFile();
   }
