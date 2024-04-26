@@ -34,8 +34,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     tiles = [
-      StatefulColorWidget(key: UniqueKey(), text: '1'),
-      StatefulColorWidget(key: UniqueKey(), text: '2'),
+      Padding(
+        key: UniqueKey(),
+        padding: const EdgeInsets.all(8.0),
+        child: StatefulColorWidget(text: '1'),
+      ),
+      Padding(
+        key: UniqueKey(),
+        padding: const EdgeInsets.all(8.0),
+        child: StatefulColorWidget(text: '2'),
+      ),
     ];
   }
 
@@ -187,3 +195,83 @@ Row Element                                               Row Element
     2.2) Проверяется Element Key и Widget key на одном уровне. old: WidgetKey2 != new: ElementKey1   =>   Вызывается свап Element'ов
 
  */
+
+/*
+
+Widget Tree:                                      ElementTree:
+Row Widget                                        Row Element
+ ├-- PaddingWidget1                                ├-- PaddingElement1
+ |    └--ColorWidget 1 (Stateful Widget)           |     └--ColorElement 1 (Stateful Element)
+ |         └-- Widget Key 1                        |          ├-- State 1
+ |                                                 |          └-- Element Key 1
+ └-- PaddingWidget2                                └-- PaddingElement2
+      └--ColorWidget 2 (Stateful Widget)                 └--ColorElement 2 (Stateful Element)
+           └-- Widget Key 2                                   ├-- State 2
+                                                              └-- Element Key 2
+
+Swap Widgets:
+
+Widget Tree:                                      ElementTree:
+Row Widget                                        Row Element
+ ├-- PaddingWidget2                                ├-- PaddingElement1
+ |    └--ColorWidget 2 (Stateful Widget)           |     └--ColorElement 1 (Stateful Element)
+ |         └-- Widget Key 2                        |          ├-- State 1
+ |                                                 |          └-- Element Key 1
+ └-- PaddingWidget1                                └-- PaddingElement2
+      └--ColorWidget 1 (Stateful Widget)                 └--ColorElement 2 (Stateful Element)
+           └-- Widget Key 1                                   ├-- State 2
+                                                              └-- Element Key 2
+
+Checks:
+
+RowElement:
+  newType: Row Widget == oldType: Row Element.widget  ------┬----> Link to RowElement
+  key: not defined                                    ------┘
+
+  RowElement children:
+
+  PaddingElement1:
+  newType: PaddingWidget2 == oldType: PaddingElement1.widget -----┬----> Link to PaddingWidget2:
+  key: not defined                                           -----┘
+
+  PaddingElement2:
+  newType: PaddingWidget1 == oldType: PaddingElement2.widget -----┬----> Link to PaddingWidget1:
+  key: not defined                                           -----┘
+
+    PaddingElement1 children:
+
+    ColorElement1
+    newType: ColorWidget2 == oldType: ColorElement1.widget ---┬---> Search new widget candidate among
+    newKey: WidgetKey2 != oldKey: ElementKey1              ---┘     other PaddingElement1 children
+                                                                              |
+     ┌----  Create new ColorElement3 <-------- Deactivate ColorElement1 <-----┘
+     |          with new State3
+     |        with key ElementKey2
+     |
+     └--------> Link ColorElement3 to ColorWidget2
+
+    PaddingElement2 children:
+
+    ColorElement2
+    newType: ColorWidget1 == oldType: ColorElement2.widget ---┬---> Search new widget candidate among
+    newKey: WidgetKey1 != oldKey: ElementKey2              ---┘     other PaddingElement2 children
+                                                                              |
+     ┌----  Create new ColorElement4 <-------- Deactivate ColorElement2 <-----┘
+     |           with new State4
+     |         with key ElementKey1
+     |
+     └--------> Link ColorElement4 to ColorWidget1
+
+new States of Trees:
+
+Widget Tree:                                      ElementTree:
+Row Widget                                        Row Element
+ ├-- PaddingWidget2                                ├-- PaddingElement1
+ |    └--ColorWidget 2 (Stateful Widget)           |     └--ColorElement 3 (Stateful Element)
+ |         └-- Widget Key 2                        |          ├-- State 3
+ |                                                 |          └-- Element Key 2
+ └-- PaddingWidget1                                └-- PaddingElement2
+      └--ColorWidget 1 (Stateful Widget)                 └--ColorElement 4 (Stateful Element)
+           └-- Widget Key 1                                   ├-- State 4
+                                                              └-- Element Key 1
+*/
