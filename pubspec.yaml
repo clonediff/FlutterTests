@@ -48,6 +48,7 @@ dependencies:
   json_annotation: ^4.8.1
   webview_flutter: ^4.7.0
   webview_flutter_plus: ^0.4.4
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   flutter_test:

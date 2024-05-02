@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:test_project/global_key_example_two.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:test_project/home_page_stateless_widget.dart';
+
+// Providers
+// Provider
+
+final nameProvider = Provider<String>((ref) {
+  return 'Rail';
+});
 
 void main() {
-  runApp(const MyFirstApp());
+  runApp(const ProviderScope(child: MyFirstApp()));
 }
 
 class MyFirstApp extends StatelessWidget {
@@ -13,7 +21,7 @@ class MyFirstApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData.dark(),
-      home: const GlobalKeyExampleTwo(),
+      home: const HomePage(),
     );
   }
 }
