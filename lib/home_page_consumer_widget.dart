@@ -7,10 +7,11 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Рекомендуется использовать в build, для отслеживания состояния Provider'а
-    final name = ref.watch(nameProvider);
-    // Рекомендуется использовать в initState для разового чтения Provider'а
-    final nameRead = ref.read(nameProvider);
+    final name = ref.watch(nameProvider) ?? '';
+
+    void onSubmit(String val) {
+      ref.read(nameProvider.notifier).update((state) => val);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -19,6 +20,9 @@ class HomePage extends ConsumerWidget {
       ),
       body: Column(
         children: [
+          TextField(
+            onSubmitted: onSubmit,
+          ),
           Center(
             child: Text(name),
           ),

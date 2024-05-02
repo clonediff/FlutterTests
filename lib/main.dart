@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:test_project/home_page_stateless_widget.dart';
+import 'package:test_project/home_page_consumer_widget.dart';
 
 // Providers
-// Provider
+// Provider - только на чтение
+// StateProvider - Provider у которого есть State
 
-final nameProvider = Provider<String>((ref) {
-  return 'Rail';
-});
+final nameProvider = StateProvider<String?>((ref) => null);
 
 void main() {
   runApp(const ProviderScope(child: MyFirstApp()));
