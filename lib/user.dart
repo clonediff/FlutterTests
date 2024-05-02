@@ -15,4 +15,5 @@ class UserNotifier extends StateNotifier<User> {
   UserNotifier() : super(const User(name: '', age: 0));
 
   void updateName(String n) => state = state.copyWith(name: n);
+  void updateAge(int age) => state = state.copyWith(age: age);
 }

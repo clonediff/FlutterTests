@@ -5,8 +5,12 @@ import 'package:test_project/main.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
-  void onSubmit(WidgetRef ref, String val) {
+  void onNameSubmit(WidgetRef ref, String val) {
     ref.read(userProvider.notifier).updateName(val);
+  }
+
+  void onAgeSubmit(WidgetRef ref, int val) {
+    ref.read(userProvider.notifier).updateAge(val);
   }
 
   @override
@@ -15,16 +19,20 @@ class HomePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Title'),
+        title: Text(user.name),
         centerTitle: true,
       ),
       body: Column(
         children: [
           TextField(
-            onSubmitted: (value) => onSubmit(ref, value),
+            onSubmitted: (value) => onNameSubmit(ref, value),
+          ),
+          TextField(
+            onSubmitted: (value) => onAgeSubmit(ref, int.parse(value)),
+            keyboardType: TextInputType.number,
           ),
           Center(
-            child: Text(user.name),
+            child: Text(user.age.toString()),
           ),
         ],
       ),
