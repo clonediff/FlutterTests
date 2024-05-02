@@ -5,36 +5,31 @@ import 'package:test_project/main.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
-  void onNameSubmit(WidgetRef ref, String val) {
-    ref.read(userChangeNotifierProvider).updateName(val);
-  }
-
-  void onAgeSubmit(WidgetRef ref, int val) {
-    ref.read(userChangeNotifierProvider).updateAge(val);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userChangeNotifierProvider).user;
+    final user = ref.watch(fetchUserProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(user.name),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          TextField(
-            onSubmitted: (value) => onNameSubmit(ref, value),
+    return user.when(
+      data: (data) => Scaffold(
+          appBar: AppBar(
+            title: const Text(''),
+            centerTitle: true,
           ),
-          TextField(
-            onSubmitted: (value) => onAgeSubmit(ref, int.parse(value)),
-            keyboardType: TextInputType.number,
+          body: Column(
+            children: [
+              Center(
+                child: Text(data.name),
+              ),
+            ],
           ),
-          Center(
-            child: Text(user.age.toString()),
+        ),
+      error: (error, stackTrace) => Scaffold(
+          body: Center(
+            child: Text(error.toString()),
           ),
-        ],
+        ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
