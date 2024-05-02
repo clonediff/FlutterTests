@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_project/helpers.dart';
 
 final counterKey = GlobalKey<_CounterWidgetState>();
 
@@ -26,16 +27,10 @@ class GlobalKeyExampleOne extends StatelessWidget {
                 counterKey.currentState?.add();
                 final newCounter = counterKey.currentState?.counter;
 
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Counter: $counter -> $newCounter',
-                        style: const TextStyle(fontSize: 32),
-                      ),
-                    ),
-                  );
+                Utils.showSnackBar(
+                  context,
+                  'Counter: $counter -> $newCounter',
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade700,
