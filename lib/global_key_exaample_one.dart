@@ -26,7 +26,16 @@ class GlobalKeyExampleOne extends StatelessWidget {
                 counterKey.currentState?.add();
                 final newCounter = counterKey.currentState?.counter;
 
-                // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: content))
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Counter: $counter -> $newCounter',
+                        style: const TextStyle(fontSize: 32),
+                      ),
+                    ),
+                  );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey.shade700,
