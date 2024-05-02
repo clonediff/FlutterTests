@@ -17,6 +17,21 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProvider);
 
+    // Не следует использовать внутри initState
+    ref.listen(
+      userProvider.select((value) => value.age),
+      (previous, next) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content:
+                  Text('Our age was ${previous ?? 0} and the new age ${next}'),
+            ),
+          );
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(user.name),
