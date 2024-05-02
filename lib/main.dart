@@ -7,8 +7,10 @@ import 'package:test_project/user.dart';
 // Provider - только на чтение
 // StateProvider - Provider у которого есть State, но используется только с примитивными типами
 // StateNotifier & StateNotifierProvider - Provider у которого есть State, но может использовать любые типы
+// ChangeNotifierProvider - Не рекомендуется использовать как новый Provider (т.к. состояние можно изменить без согласования с провайдером), используется только для совместимости с пакетом Provider
 
-final userProvider = StateNotifierProvider<UserNotifier, User>((ref) => UserNotifier());
+// final userProvider = StateNotifierProvider<UserNotifier, User>((ref) => UserNotifier());
+final userChangeNotifierProvider = ChangeNotifierProvider((ref) => UserNotifierChange());
 
 void main() {
   runApp(const ProviderScope(child: MyFirstApp()));

@@ -6,31 +6,16 @@ class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   void onNameSubmit(WidgetRef ref, String val) {
-    ref.read(userProvider.notifier).updateName(val);
+    ref.read(userChangeNotifierProvider).updateName(val);
   }
 
   void onAgeSubmit(WidgetRef ref, int val) {
-    ref.read(userProvider.notifier).updateAge(val);
+    ref.read(userChangeNotifierProvider).updateAge(val);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-
-    // Не следует использовать внутри initState
-    ref.listen(
-      userProvider.select((value) => value.age),
-      (previous, next) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content:
-                  Text('Our age was ${previous ?? 0} and the new age ${next}'),
-            ),
-          );
-      },
-    );
+    final user = ref.watch(userChangeNotifierProvider).user;
 
     return Scaffold(
       appBar: AppBar(
