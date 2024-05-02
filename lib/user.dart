@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:http/http.dart' as http;
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -14,6 +16,15 @@ class User with _$User {
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   factory User.fromStringJson(String jsonString) => User.fromJson(json.decode(jsonString));
+}
+
+final userRepositoryProvider = Provider((ref) => UserRepository());
+
+class UserRepository {
+  Future<User> fetchUserData() {
+    const url = 'https://jsonplaceholder.typicode.com/users/1';
+    return http.get(Uri.parse(url)).then((value) => User.fromStringJson(value.body));
+  }
 }
 
 // class UserNotifier extends StateNotifier<User> {

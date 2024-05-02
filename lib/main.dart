@@ -13,8 +13,8 @@ import 'package:test_project/user.dart';
 
 final fetchUserProvider = FutureProvider(
   (ref) {
-    const url = 'https://jsonplaceholder.typicode.com/users/1';
-    return http.get(Uri.parse(url)).then((value) => User.fromStringJson(value.body));
+    final userRepository = ref.watch(userRepositoryProvider);
+    return userRepository.fetchUserData();
   },
 );
 
