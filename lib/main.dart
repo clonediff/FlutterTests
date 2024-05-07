@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:test_project/home_page_consumer_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_project/logger_riverpod.dart';
 import 'package:test_project/user.dart';
 
 // Providers
@@ -36,6 +37,7 @@ final fetchUserProvider = FutureProvider.autoDispose.family(
     final userRepository = ref.watch(userRepositoryProvider);
     return userRepository.fetchUserData(userId);
   },
+  name: 'Future Provider',
 );
 
 final streamProvider = StreamProvider(
@@ -48,7 +50,12 @@ final streamProvider = StreamProvider(
 );
 
 void main() {
-  runApp(const ProviderScope(child: MyFirstApp()));
+  runApp(ProviderScope(
+    observers: [
+      LoggerRiverpod(),
+    ],
+    child: const MyFirstApp(),
+  ));
 }
 
 class MyFirstApp extends StatelessWidget {
