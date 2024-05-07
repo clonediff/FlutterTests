@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user.freezed.dart';
 part 'user.g.dart';
@@ -18,7 +19,9 @@ class User with _$User {
   factory User.fromStringJson(String jsonString) => User.fromJson(json.decode(jsonString));
 }
 
-final userRepositoryProvider = Provider((ref) => UserRepository());
+@riverpod
+UserRepository userRepository(UserRepositoryRef ref) => UserRepository();
+// final userRepositoryProvider = Provider((ref) => UserRepository());
 
 class UserRepository {
   Future<User> fetchUserData(String userId) {

@@ -14,8 +14,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(fetchUserProvider(userId));
-
+    final user = ref.watch(fetchUserProvider( userId: userId, intValue: 1, boolValue: true));
+    // final stream = ref.watch(streamProvider);
     return user.when(
       data: (data) => Scaffold(
         appBar: AppBar(

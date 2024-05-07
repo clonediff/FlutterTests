@@ -3,10 +3,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:test_project/home_page_consumer_widget.dart';
-import 'package:http/http.dart' as http;
 import 'package:test_project/logger_riverpod.dart';
 import 'package:test_project/user.dart';
+
+part 'main.g.dart';
 
 // Providers
 // Provider - только на чтение
@@ -16,38 +18,72 @@ import 'package:test_project/user.dart';
 // FutureProvider - удобная работа с Future
 // StreamProvider - для работы со Stream
 
-final fetchUserProvider = FutureProvider.autoDispose.family(
-  (ref, String userId) {
-    log('Init: fetchUser($userId)');
-    ref.onCancel(() => log('Cancel: fetchUser($userId)'));
-    ref.onResume(() => log('Resume: fetchUser($userId)'));
-    ref.onDispose(() => log('Dispose: fetchUser($userId)'));
+@riverpod
+String name(NameRef ref) {
+  return 'Konstantin Kokorin';
+}
+// final nameProvider = Provider((ref) => 'Konstantin Kokorin');
 
-    final link = ref.keepAlive();
+@riverpod
+Future<User> fetchUser(FetchUserRef ref, {required String userId, required int intValue, required bool boolValue}) {
+  log('Init: fetchUser($userId)');
+  ref.onCancel(() => log('Cancel: fetchUser($userId)'));
+  ref.onResume(() => log('Resume: fetchUser($userId)'));
+  ref.onDispose(() => log('Dispose: fetchUser($userId)'));
 
-    Timer? timer;
+  final link = ref.keepAlive();
 
-    ref.onDispose(() => timer?.cancel());
-    // Для удаления из кэша состояния провайдера используем link.close()
-    ref.onCancel(() {
-      timer = Timer(const Duration(seconds: 10), () => link.close());
-    });
-    ref.onResume(() => timer?.cancel());
+  Timer? timer;
 
-    final userRepository = ref.watch(userRepositoryProvider);
-    return userRepository.fetchUserData(userId);
-  },
-  name: 'Future Provider',
-);
+  ref.onDispose(() => timer?.cancel());
+  // Для удаления из кэша состояния провайдера используем link.close()
+  ref.onCancel(() {
+    timer = Timer(const Duration(seconds: 10), () => link.close());
+  });
+  ref.onResume(() => timer?.cancel());
 
-final streamProvider = StreamProvider(
-  (ref) {
-    return Stream.periodic(
-      const Duration(seconds: 1),
-      (computationCount) => computationCount,
-    );
-  },
-);
+  final userRepository = ref.watch(userRepositoryProvider);
+  return userRepository.fetchUserData(userId);
+}
+// final fetchUserProvider = FutureProvider.autoDispose.family(
+//   (ref, String userId) {
+//     log('Init: fetchUser($userId)');
+//     ref.onCancel(() => log('Cancel: fetchUser($userId)'));
+//     ref.onResume(() => log('Resume: fetchUser($userId)'));
+//     ref.onDispose(() => log('Dispose: fetchUser($userId)'));
+//
+//     final link = ref.keepAlive();
+//
+//     Timer? timer;
+//
+//     ref.onDispose(() => timer?.cancel());
+//     // Для удаления из кэша состояния провайдера используем link.close()
+//     ref.onCancel(() {
+//       timer = Timer(const Duration(seconds: 10), () => link.close());
+//     });
+//     ref.onResume(() => timer?.cancel());
+//
+//     final userRepository = ref.watch(userRepositoryProvider);
+//     return userRepository.fetchUserData(userId);
+//   },
+//   name: 'Future Provider',
+// );
+
+@riverpod
+Stream stream(StreamRef ref) {
+  return Stream.periodic(
+    const Duration(seconds: 1),
+        (computationCount) => computationCount,
+  );
+}
+// final streamProvider = StreamProvider(
+//   (ref) {
+//     return Stream.periodic(
+//       const Duration(seconds: 1),
+//       (computationCount) => computationCount,
+//     );
+//   },
+// );
 
 void main() {
   runApp(ProviderScope(
