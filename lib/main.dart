@@ -12,10 +12,24 @@ import 'package:test_project/user.dart';
 // FutureProvider - удобная работа с Future
 // StreamProvider - для работы со Stream
 
-final fetchUserProvider = FutureProvider(
-  (ref) {
+final fetchUserProvider = FutureProvider
+  // Вызывать Dispose как только слушатели этого провайдера исчезают из экрана
+  // Если не использовать, то Provider перейдет в кэш до рестарта приложения
+    .autoDispose
+  // Можно передать только неизменяемые и сравниваемые объекты, можно использовать след. пакеты:
+  // tuple
+  // freezed
+  // equitable
+  // riverpod_generator
+    .family(
+  (ref, String userId) {
+  // Позволяет сохранить состояние на некоторое время в кэше, но не до рестарта
+    ref.keepAlive();
+  // Можно добавить события на
+    ref.onAddListener(() { });
+    ref.onRemoveListener(() { });
     final userRepository = ref.watch(userRepositoryProvider);
-    return userRepository.fetchUserData();
+    return userRepository.fetchUserData(userId);
   },
 );
 

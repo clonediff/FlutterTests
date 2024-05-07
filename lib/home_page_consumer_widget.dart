@@ -2,26 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:test_project/main.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final streamNumber = ref.watch(streamProvider);
-    return Scaffold(
-      body: streamNumber.when(
-        data: (data) => Center(
-          child: Text(
-            data.toString(),
-            style: const TextStyle(fontSize: 25),
-          ),
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  String userId = '1';
+
+  @override
+  Widget build(BuildContext context) {
+    final user = ref.watch(fetchUserProvider(userId));
+
+    return user.when(
+      data: (data) => Scaffold(
+        appBar: AppBar(
+          title: const Text(''),
+          centerTitle: true,
         ),
-        error: (error, stackTrace) => Center(
+        body: Column(
+          children: [
+            TextField(
+              onSubmitted: (value) {
+                userId = value;
+                setState(() {});
+              },
+            ),
+            Center(
+              child: Text(data.name),
+            ),
+          ],
+        ),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        body: Center(
           child: Text(error.toString()),
         ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+      ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

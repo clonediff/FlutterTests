@@ -21,8 +21,8 @@ class User with _$User {
 final userRepositoryProvider = Provider((ref) => UserRepository());
 
 class UserRepository {
-  Future<User> fetchUserData() {
-    const url = 'https://jsonplaceholder.typicode.com/users/1';
+  Future<User> fetchUserData(String userId) {
+    final url = 'https://jsonplaceholder.typicode.com/users/$userId';
     return http.get(Uri.parse(url)).then((value) => User.fromStringJson(value.body));
   }
 }
