@@ -10,11 +10,21 @@ import 'package:test_project/user.dart';
 // StateNotifier & StateNotifierProvider - Provider у которого есть State, но может использовать любые типы
 // ChangeNotifierProvider - Не рекомендуется использовать как новый Provider (т.к. состояние можно изменить без согласования с провайдером), используется только для совместимости с пакетом Provider
 // FutureProvider - удобная работа с Future
+// StreamProvider - для работы со Stream
 
 final fetchUserProvider = FutureProvider(
   (ref) {
     final userRepository = ref.watch(userRepositoryProvider);
     return userRepository.fetchUserData();
+  },
+);
+
+final streamProvider = StreamProvider(
+  (ref) {
+    return Stream.periodic(
+      const Duration(seconds: 1),
+      (computationCount) => computationCount,
+    );
   },
 );
 

@@ -7,29 +7,21 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(fetchUserProvider);
-
-    return user.when(
-      data: (data) => Scaffold(
-          appBar: AppBar(
-            title: const Text(''),
-            centerTitle: true,
-          ),
-          body: Column(
-            children: [
-              Center(
-                child: Text(data.name),
-              ),
-            ],
+    final streamNumber = ref.watch(streamProvider);
+    return Scaffold(
+      body: streamNumber.when(
+        data: (data) => Center(
+          child: Text(
+            data.toString(),
+            style: const TextStyle(fontSize: 25),
           ),
         ),
-      error: (error, stackTrace) => Scaffold(
-          body: Center(
-            child: Text(error.toString()),
-          ),
+        error: (error, stackTrace) => Center(
+          child: Text(error.toString()),
         ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }
